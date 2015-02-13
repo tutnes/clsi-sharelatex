@@ -75,4 +75,4 @@ module.exports = RequestParser =
 		return attribute
 
 	_sanitizePath: (path) ->
-		path.replace(/[^a-zA-Z0-9_\-;.,\/ ]/g, "")
+		path.replace(/[\#\&\;\`\|\*\?\~\<\>\^\(\)\[\]\{\}\$\\\x0A\xFF\x00]/g, "")
