@@ -3,6 +3,7 @@ fs = require "fs"
 Path = require "path"
 spawn = require("child_process").spawn
 logger = require "logger-sharelatex"
+glob = require("glob")
 
 module.exports = OutputFileFinder =
 	findOutputFiles: (resources, directory, callback = (error, outputFiles) ->) ->
@@ -24,26 +25,11 @@ module.exports = OutputFileFinder =
 					}
 			callback null, outputFiles
 
-	_getAllFiles: (directory, _callback = (error, fileList) ->) ->
-		callback = (error, fileList) ->
-			_callback(error, fileList)
-			_callback = () ->
-				
-		args = [directory, "-name", ".cache", "-prune", "-o", "-type", "f", "-print"]
-		logger.log args: args, "running find command"
-
-		proc = spawn("find", args)
-		stdout = ""
-		proc.stdout.on "data", (chunk) ->
-			stdout += chunk.toString()	
-		proc.on "error", callback	
-		proc.on "close", (code) ->
-			if code != 0
-				logger.warn {directory, code}, "find returned error, directory likely doesn't exist"
-				return callback null, []
-			fileList = stdout.trim().split("\n")
-			fileList = fileList.map (file) ->
-				# Strip leading directory
-				path = Path.relative(directory, file)
-			return callback null, fileList
-
+	_getAllFiles: (directory, callback = (error, fileList) ->) ->
+		# the original command was find -name .cache -prune -o -type f -print
+		#
+		# the glob command below has one difference: it ignores all dot
+		# files and directories (.*).  If the user is not creating dot files then it should be ok.
+		glob "**/*", { cwd: directory, dot:false, nonull:false, nodir:true, follow:false}, (err, result) ->
+			console.log 'GLOB:', err, result
+			callback(err, result)

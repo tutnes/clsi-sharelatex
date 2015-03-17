@@ -5,12 +5,11 @@ modulePath = require('path').join __dirname, '../../../app/js/OutputFileFinder'
 path = require "path"
 expect = require("chai").expect
 EventEmitter = require("events").EventEmitter
+mock = require("mock-fs")
 
 describe "OutputFileFinder", ->
 	beforeEach ->
 		@OutputFileFinder = SandboxedModule.require modulePath, requires:
-			"fs": @fs = {}
-			"child_process": spawn: @spawn = sinon.stub()
 			"logger-sharelatex": { log: sinon.stub(), warn: sinon.stub() }
 		@directory = "/test/dir"
 		@callback = sinon.stub()
@@ -37,30 +36,45 @@ describe "OutputFileFinder", ->
 			
 	describe "_getAllFiles", ->
 		beforeEach ->
-			@proc = new EventEmitter()
-			@proc.stdout = new EventEmitter()
-			@spawn.returns @proc
-			@directory = "/base/dir"
-			@OutputFileFinder._getAllFiles @directory, @callback
-			
+			mock {
+				'/base/dir' :
+					'main.tex' : "hello world"
+					'chapters' : {
+						'chapter1.tex': "hello chapter 1"
+					}
+					'.cache' : {
+						"123456" : {
+							"output.log" : "old output"
+							"output.pdf" : "old pdf"
+						}
+					}
+			}
+
+		afterEach ->
+			mock.restore()
+
 		describe "successfully", ->
-			beforeEach ->
-				@proc.stdout.emit(
-					"data",
-					["/base/dir/main.tex", "/base/dir/chapters/chapter1.tex"].join("\n") + "\n"
-				)
-				@proc.emit "close", 0
-				
+			beforeEach (done) ->
+				@directory = "/base/dir"
+				@OutputFileFinder._getAllFiles @directory, (err,res) =>
+					console.log 'ERR', err, 'RES', res
+					@callback(err,res)
+					done()
+
 			it "should call the callback with the relative file paths", ->
 				@callback.calledWith(
 					null,
-					["main.tex", "chapters/chapter1.tex"]
+					["chapters/chapter1.tex", "main.tex"]
 				).should.equal true
 
 		describe "when the directory doesn't exist", ->
-			beforeEach ->
-				@proc.emit "close", 1
-				
+			beforeEach (done) ->
+				@directory = "/base/doesntexist"
+				@OutputFileFinder._getAllFiles @directory, (err,res) =>
+					console.log 'ERR', err, 'RES', res
+					@callback(err,res)
+					done()
+			
 			it "should call the callback with a blank array", ->
 				@callback.calledWith(
 					null,
