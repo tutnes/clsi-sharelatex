@@ -42,7 +42,7 @@ describe "SymlinkCheckerMiddlewear", ->
 			@fs.realpath = sinon.stub().callsArgWith(1, null, "/etc/#{@req.params.project_id}/output.pdf")
 
 		it "should send a 404", (done)->
-			@res.send = (resCode)->
+			@res.sendStatus = (resCode)->
 				resCode.should.equal 404
 				done()
 			@SymlinkCheckerMiddlewear @req, @res
@@ -53,7 +53,7 @@ describe "SymlinkCheckerMiddlewear", ->
 			@fs.realpath = sinon.stub().callsArgWith(1, "error")
 
 		it "should send a 500", (done)->
-			@res.send = (resCode)->
+			@res.sendStatus = (resCode)->
 				resCode.should.equal 500
 				done()
 			@SymlinkCheckerMiddlewear @req, @res

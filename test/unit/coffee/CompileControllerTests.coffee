@@ -46,6 +46,8 @@ describe "CompileController", ->
 			}]
 			@output = {"mock":"output"}
 			@RequestParser.parse = sinon.stub().callsArgWith(1, null, @request)
+			@ProjectPersistenceManager.markProjectAsJustAccessed = sinon.stub().callsArg(1)
+			@res.status = sinon.stub().returnsThis()
 			@res.send = sinon.stub()
 
 		describe "successfully", ->
@@ -64,8 +66,9 @@ describe "CompileController", ->
 					.should.equal true
 
 			it "should return the JSON response", ->
+				@res.status.calledWith(200).should.equal true
 				@res.send
-					.calledWith(200,
+					.calledWith(
 						compile:
 							status: "success"
 							error: null
@@ -82,8 +85,9 @@ describe "CompileController", ->
 				@CompileController.compile @req, @res
 		
 			it "should return the JSON response with the error", ->
+				@res.status.calledWith(500).should.equal true
 				@res.send
-					.calledWith(500,
+					.calledWith(
 						compile:
 							status: "error"
 							error:  @message
@@ -100,8 +104,9 @@ describe "CompileController", ->
 				@CompileController.compile @req, @res
 		
 			it "should return the JSON response with the timeout status", ->
+				@res.status.calledWith(200).should.equal true
 				@res.send
-					.calledWith(200,
+					.calledWith(
 						compile:
 							status: "timedout"
 							error: @message
@@ -118,14 +123,17 @@ describe "CompileController", ->
 				session_id: @session_id = "session-id-123"
 			@res.send = sinon.stub()
 			@CompileController.stopCompile @req, @res, @next
-		
-		it "should stop the compile", ->
-			@CompileManager.stopCompile
-				.calledWith(@project_id, @session_id)
-				.should.equal true
-		
-		it "should return 204", ->
-			@res.send.calledWith(204).should.equal true
+
+			it "should return the JSON response with the failure status", ->
+				@res.status.calledWith(200).should.equal true
+				@res.send
+					.calledWith(
+						compile:
+							error: null
+							status: "failure"
+							outputFiles: []
+					)
+					.should.equal true
 
 	describe "syncFromCode", ->
 		beforeEach ->
@@ -197,7 +205,7 @@ describe "CompileController", ->
 				limits: @limits = {mock: "limits", timeout: 42}
 				resources: @resources = ["mock", "resources"]
 			}
-			@res.send = sinon.stub()
+			@res.sendStatus = sinon.stub()
 			@CompileManager.sendJupyterRequest = sinon.stub().callsArg(7)
 			@RequestParser.parseResources = sinon.stub().callsArgWith(1, null, @parsed_resources = ["parsed", "resources"])
 			@CompileController.sendJupyterRequest @req, @res, @next
@@ -216,7 +224,7 @@ describe "CompileController", ->
 			@limits.timeout.should.equal 42000
 		
 		it "should return 204", ->
-			@res.send.calledWith(204).should.equal true
+			@res.sendStatus.calledWith(204).should.equal true
 	
 	describe "interruptJupyterRequest", ->
 		beforeEach ->
@@ -224,7 +232,7 @@ describe "CompileController", ->
 			@req.params =
 				project_id: @project_id
 				request_id: @request_id = "messsage-123"
-			@res.send = sinon.stub()
+			@res.sendStatus = sinon.stub()
 			@CompileController.interruptJupyterRequest @req, @res, @next
 		
 		it "should interrupt the request", ->
@@ -233,6 +241,6 @@ describe "CompileController", ->
 				.should.equal true
 		
 		it "should return 204", ->
-			@res.send.calledWith(204).should.equal true
+			@res.sendStatus.calledWith(204).should.equal true
 		
 			
