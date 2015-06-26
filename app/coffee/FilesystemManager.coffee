@@ -49,7 +49,7 @@ module.exports = FilesystemManager =
 					callbackOnce = (error) ->
 						callback(error)
 						callback = () ->
-					writeStream = fs.createWriteStream(path)
+					writeStream = fs.createWriteStream(path, {mode: 0o444})
 					writeStream.on "error", callbackOnce
 					writeStream.on "close", () -> callbackOnce()
 					readStream.on "error", callbackOnce
@@ -61,7 +61,7 @@ module.exports = FilesystemManager =
 			mkdirp Path.dirname(path), (error) ->
 				return callback(error) if error?
 				fs.unlink path, (error) ->
-					fs.writeFile path, content, callback
+					fs.writeFile path, content, {mode: 0o444}, callback
 			
 	clearProject: (project_id, _callback = (error) ->) -> 
 		callback = (error) ->
@@ -103,13 +103,22 @@ module.exports = FilesystemManager =
 			else
 				return callback(new Error("find/-delete #{directory} failed: #{stderr}"))
 
-	getAllFiles: (project_id, _callback = (error, files) ->) ->
+	getAllFiles: (project_id, options, _callback) ->
+		if not _callback?
+			if typeof options == "function"
+				_callback = options
+				options = {}
+			else
+				_callback = (error, files) ->
+
 		callback = (error, fileList) ->
 			_callback(error, fileList)
 			_callback = () ->
 				
 		directory = Path.join(settings.path.compilesDir, project_id)
 		args = [directory, "-type", "f"]
+		if options?.gid?
+			args.push "-gid", options.gid
 		logger.log args: args, "running find command"
 
 		proc = child_process.spawn("find", args)

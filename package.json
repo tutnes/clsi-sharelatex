@@ -10,6 +10,7 @@
   "dependencies": {
     "async": "0.2.9",
     "lynx": "0.0.11",
+    "lru-cache": "^2.6.5",
     "mkdirp": "0.3.5",
     "mysql": "2.0.0-alpha7",
     "request": "~2.21.0",

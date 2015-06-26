@@ -16,6 +16,7 @@ describe "ResourceWriter", ->
 				Timer: class Timer
 					done: sinon.stub()
 			"./FilesystemManager": @FilesystemManager = {}
+			"logger-sharelatex": @logger = { log: sinon.stub(), error: sinon.stub() }
 		@project_id = "project-id-123"
 		@callback = sinon.stub()
 
@@ -45,40 +46,31 @@ describe "ResourceWriter", ->
 
 	describe "_removeExtraneousFiles", ->
 		beforeEach ->
-			@output_files = [{
-				path: "output.pdf"
-				type: "pdf"
-			}, {
-				path: "extra/file.tex"
-				type: "tex"
-			}, {
-				path: "extra.aux"
-				type: "aux"
+			@previous_files = ['test.py', 'test.R']
+			@current_files = ['test.R']
+			@resources = [{
+				path: "test.R"
+				type: "txt"
 			}]
-			@resources = "mock-resources"
-			@OutputFileFinder.findOutputFiles = sinon.stub().callsArgWith(2, null, @output_files)
+			@ResourceWriter._findPreviousFiles = sinon.stub().callsArgWith(1, null, @previous_files)
+			@ResourceWriter._findCurrentFiles = sinon.stub().callsArgWith(2, null, @current_files)
 			@FilesystemManager.deleteFileIfNotDirectory = sinon.stub().callsArg(2)
 			@FilesystemManager.deleteEmptyDirectories = sinon.stub().callsArg(1)
 			@ResourceWriter._removeExtraneousFiles(@project_id, @resources, @callback)
 
-		it "should find the existing output files", ->
-			@OutputFileFinder.findOutputFiles
+		it "should find the existing files", ->
+			@ResourceWriter._findPreviousFiles
+				.calledWith(@project_id)
+				.should.equal true
+
+		it "should find the new files", ->
+			@ResourceWriter._findCurrentFiles
 				.calledWith(@project_id, @resources)
 				.should.equal true
 
-		it "should delete the output files", ->
+		it "should unlink the deleted files", ->
 			@FilesystemManager.deleteFileIfNotDirectory
-				.calledWith(@project_id, "output.pdf")
-				.should.equal true
-
-		it "should delete the extra files", ->
-			@FilesystemManager.deleteFileIfNotDirectory
-				.calledWith(@project_id, "extra/file.tex")
-				.should.equal true
-
-		it "should also delete the extra aux files", ->
-			@FilesystemManager.deleteFileIfNotDirectory
-				.calledWith(@project_id, "extra.aux")
+				.calledWith(@project_id, "test.py")
 				.should.equal true
 
 		it "should delete any empty directories", ->
