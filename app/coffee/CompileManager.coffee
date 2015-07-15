@@ -97,7 +97,7 @@ module.exports = CompileManager =
 			callback(error, filesExcludingHidden)
 
 	deleteFile: (project_id, file, callback = (error) ->) ->
-		cmd = ['/bin/rm', '-f', file]
+		cmd = ['/bin/rm', '-f', '--', file]
 		DockerRunner.run project_id, cmd, {skipImport:true}, {}, (error, stream) ->
 			return callback(error) if error?
 			stream.on "end", () ->
