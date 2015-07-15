@@ -10,6 +10,7 @@ logger = require "logger-sharelatex"
 Metrics = require "./Metrics"
 child_process = require "child_process"
 DockerRunner = require "docker-runner-sharelatex"
+_ = require "underscore"
 
 module.exports = CompileManager =
 	INPROGRESS_STREAMS: {}
@@ -89,7 +90,11 @@ module.exports = CompileManager =
 		callback()
 
 	listFiles: (project_id, callback = (error, outputFiles) ->) ->
-		OutputFileFinder.findOutputFiles project_id, [], callback
+		OutputFileFinder.findOutputFiles project_id, [], (error, outputFiles) ->
+			return callback(error) if error?
+			filesExcludingHidden = _.reject outputFiles, (file) ->
+				file.path.match(/^\.|\/\./)  # files beginning with . or containing /.
+			callback(error, filesExcludingHidden)
 
 	deleteFile: (project_id, file, callback = (error) ->) ->
 		cmd = ['/bin/rm', '-f', file]
