@@ -87,7 +87,17 @@ module.exports = CompileManager =
 		
 		stream.emit "kill"
 		callback()
-	
+
+	listFiles: (project_id, callback = (error, outputFiles) ->) ->
+		OutputFileFinder.findOutputFiles project_id, [], callback
+
+	deleteFile: (project_id, file, callback = (error) ->) ->
+		cmd = ['/bin/rm', '-f', file]
+		DockerRunner.run project_id, cmd, {}, {}, (error, stream) ->
+			return callback(error) if error?
+			stream.on "end", () ->
+				callback()
+
 	sendJupyterRequest: (project_id, resources, request_id, engine, msg_type, content, limits, _callback = (error) ->) ->
 		callback = (args...) ->
 			_callback(args...)
