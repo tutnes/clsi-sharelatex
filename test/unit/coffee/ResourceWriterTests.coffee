@@ -58,6 +58,7 @@ describe "ResourceWriter", ->
 			@resources = "mock-resources"
 			@OutputFileFinder.findOutputFiles = sinon.stub().callsArgWith(2, null, @output_files)
 			@FilesystemManager.deleteFileIfNotDirectory = sinon.stub().callsArg(2)
+			@FilesystemManager.deleteEmptyDirectories = sinon.stub().callsArg(1)
 			@ResourceWriter._removeExtraneousFiles(@project_id, @resources, @callback)
 
 		it "should find the existing output files", ->
@@ -75,10 +76,15 @@ describe "ResourceWriter", ->
 				.calledWith(@project_id, "extra/file.tex")
 				.should.equal true
 
-		it "should not delete the extra aux files", ->
+		it "should also delete the extra aux files", ->
 			@FilesystemManager.deleteFileIfNotDirectory
 				.calledWith(@project_id, "extra.aux")
-				.should.equal false
+				.should.equal true
+
+		it "should delete any empty directories", ->
+			@FilesystemManager.deleteEmptyDirectories
+				.calledWith(@project_id)
+				.should.equal true
 
 		it "should call the callback", ->
 			@callback.called.should.equal true
