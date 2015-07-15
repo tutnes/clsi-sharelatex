@@ -79,6 +79,27 @@ module.exports = FilesystemManager =
 			else
 				return callback(new Error("rm -r #{directory} failed: #{stderr}"))
 
+	deleteEmptyDirectories: (project_id, _callback = (error) ->) ->
+		callback = (error) ->
+			_callback(error)
+			_callback = () ->
+
+		directory = Path.join(settings.path.compilesDir, project_id)
+		proc = child_process.spawn "find", [directory,
+			"-depth", "-mindepth", "1",
+			"-type", "d", "-empty", "-delete" ]
+
+		proc.on "error", callback
+
+		stderr = ""
+		proc.stderr.on "data", (chunk) -> stderr += chunk.toString()
+
+		proc.on "close", (code) ->
+			if code == 0
+				return callback(null)
+			else
+				return callback(new Error("find/-delete #{directory} failed: #{stderr}"))
+
 	getAllFiles: (project_id, _callback = (error, files) ->) ->
 		callback = (error, fileList) ->
 			_callback(error, fileList)

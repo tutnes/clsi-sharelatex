@@ -25,16 +25,13 @@ module.exports = ResourceWriter =
 			for file in outputFiles or []
 				do (file) ->
 					path = file.path
-					should_delete = true
-					if path.match(/^output\./) or path.match(/\.aux$/)
-						should_delete = false
-					if path == "output.pdf" or path == "output.dvi" or path == "output.log"
-						should_delete = true
-					if should_delete
-						jobs.push (callback) ->
-							FilesystemManager.deleteFileIfNotDirectory project_id, path, callback
+					console.log "will delete", path
+					jobs.push (callback) ->
+						FilesystemManager.deleteFileIfNotDirectory project_id, path, callback
 
-			async.series jobs, callback
+			async.series jobs, (error) ->
+				return callback(error) if error?
+				FilesystemManager.deleteEmptyDirectories project_id, callback
 
 	_writeResourcesToDisk: (project_id, resources, callback = (error) ->) ->
 		async.mapSeries resources,
