@@ -88,7 +88,10 @@ module.exports = CompileManager =
 		stream.emit "kill"
 		callback()
 	
-	sendJupyterRequest: (project_id, resources, request_id, engine, msg_type, content, limits, callback = (error) ->) ->
+	sendJupyterRequest: (project_id, resources, request_id, engine, msg_type, content, limits, _callback = (error) ->) ->
+		callback = (args...) ->
+			_callback(args...)
+			_callback = () ->
 		logger.log {project_id, request_id, engine, msg_type, content, limits}, "sending jupyter message"
 		ProjectPersistenceManager.markProjectAsJustAccessed project_id, (error) ->
 			return next(error) if error?
@@ -104,6 +107,7 @@ module.exports = CompileManager =
 							message.request_id = request_id
 							logger.log {message, request_id, project_id}, "got response from jupyter kernel"
 							RealTimeApiManager.bufferMessageForSending project_id, message
+						stream.on "error", callback
 						stream.on "end", () ->
 							delete CompileManager.INPROGRESS_STREAMS[stream_id]
 							callback()
