@@ -75,5 +75,5 @@ module.exports = LatexRunner =
 
 	_rCommand: (mainFile) -> ["Rscript", "/usr/bin/datajoy-wrapper.R", mainFile]
 	
-	_aptGetInstallCommand: (pkg) -> ["apt-get", "install", "-y", pkg]
+	_aptGetInstallCommand: (pkg) -> ["python", "-u", "/usr/bin/datajoy-apt-get-install.py", pkg]
 
