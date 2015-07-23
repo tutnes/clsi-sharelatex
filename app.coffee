@@ -1,9 +1,21 @@
 CompileController = require "./app/js/CompileController"
 Settings = require "settings-sharelatex"
 logger = require "logger-sharelatex"
-logger.initialize("clsi")
+ClsiLogger = logger.initialize("clsi").logger
+
 if Settings.sentry?.dsn?
 	logger.initializeErrorReporting(Settings.sentry.dsn)
+
+# truncate long output messages in log
+ClsiLogger.addSerializers {
+	message: (msg) ->
+		JSON.stringify msg, (key, value) ->
+			if typeof value == 'string' && (len = value.length) > 255
+				return value.substr(0,64) + "...(message of length #{len} truncated)"
+			else
+				return value
+}
+
 smokeTest = require "smoke-test-sharelatex"
 
 Path = require "path"
