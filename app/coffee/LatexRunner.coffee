@@ -16,7 +16,7 @@ module.exports = LatexRunner =
 			processes:  options.processes or 100 # Number of running processes
 		}
 
-		logger.log compiler: compiler, limits: limits, mainFile: mainFile, "starting compile"
+		logger.log {project_id, compiler, limits, mainFile}, "starting compile"
 
 		# We want to run latexmk on the tex file which we will automatically
 		# generate from the Rtex file.
