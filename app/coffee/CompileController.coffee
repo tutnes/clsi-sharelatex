@@ -23,7 +23,7 @@ module.exports = CompileController =
 					status = "success"
 
 				timer.done()
-				res.send (code or 200), {
+				res.status(code or 200).send {
 					compile:
 						status: status
 						error:  error?.message or error
@@ -37,14 +37,14 @@ module.exports = CompileController =
 		{project_id, session_id} = req.params
 		CompileManager.stopCompile project_id, session_id, (error) ->
 			return next(error) if error?
-			res.send 204
+			res.sendStatus(204)
 
 	listFiles: (req, res, next) ->
 		{project_id} = req.params
 		CompileManager.listFiles project_id, (error, outputFiles) ->
 			if error?
 				code = 500
-			res.send (code or 200), {
+			res.status(code or 200).send {
 				outputFiles: outputFiles.map (file) ->
 							url: "#{Settings.apis.clsi.url}/project/#{project_id}/output/#{file.path}"
 							name: "#{file.path}"
@@ -55,7 +55,7 @@ module.exports = CompileController =
 		{project_id, file} = req.params
 		CompileManager.deleteFile project_id, file, (error) ->
 			return next(error) if error?
-			res.send 204
+			res.sendStatus(204)
 
 	sendJupyterRequest: (req, res, next) ->
 		{project_id} = req.params
@@ -66,18 +66,18 @@ module.exports = CompileController =
 				limits.timeout = limits.timeout * 1000 # Request is in seconds, internally we use ms
 			CompileManager.sendJupyterRequest project_id, resources, request_id, engine, msg_type, content, limits, (error) ->
 				return next(error) if error?
-				res.send 204
+				res.sendStatus(204)
 	
 	interruptJupyterRequest: (req, res, next) ->
 		{project_id, request_id} = req.params
 		CompileManager.interruptJupyterRequest project_id, request_id, (error) ->
 			return next(error) if error?
-			res.send 204
+			res.sendStatus(204)
 		
 	clearCache: (req, res, next = (error) ->) ->
 		ProjectPersistenceManager.clearProject req.params.project_id, (error) ->
 			return next(error) if error?
-			res.send 204 # No content
+			res.sendStatus(204) # No content
 
 	syncFromCode: (req, res, next = (error) ->) ->
 		file   = req.query.file
