@@ -25,7 +25,6 @@ module.exports = ResourceWriter =
 			for file in outputFiles or []
 				do (file) ->
 					path = file.path
-					console.log "will delete", path
 					jobs.push (callback) ->
 						FilesystemManager.deleteFileIfNotDirectory project_id, path, callback
 
