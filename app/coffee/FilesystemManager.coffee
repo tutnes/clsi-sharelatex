@@ -89,9 +89,13 @@ module.exports = FilesystemManager =
 			_callback = () ->
 
 		directory = Path.join(settings.path.compilesDir, project_id)
-		proc = child_process.spawn "find", [directory,
+		args = [directory,
 			"-depth", "-mindepth", "1",
-			"-type", "d", "-empty", "-delete" ]
+			"-type", "d",
+			"-gid", process.getgid() # delete empty directories owned by the editor
+			"-empty", "-delete" ]
+		logger.log args: args, "running find command in deleteEmptyDirectories"
+		proc = child_process.spawn "find", args
 
 		proc.on "error", callback
 

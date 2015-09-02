@@ -33,14 +33,19 @@ module.exports = ResourceWriter =
 				removedFilesList = _.difference oldFilesList, newFilesList
 				logger.log {removedFilesList}, "files to remove"
 				jobs = []
+				removedFileFromSubdir = false
 				for file in removedFilesList or []
+					removedFileFromSubdir = true if file.indexOf "/" >= 0
 					do (file) ->
 						jobs.push (callback) ->
 							FilesystemManager.deleteFileIfNotDirectory project_id, file, callback
 
 				async.series jobs, (error) ->
 					return callback(error) if error?
-					FilesystemManager.deleteEmptyDirectories project_id, callback
+					if jobs.length > 0 and removedFileFromSubdir
+						FilesystemManager.deleteEmptyDirectories project_id, callback
+					else
+						callback()
 
 	_findPreviousFiles: (project_id, callback = (error, result) ->) ->
 		prevFiles = FileListCache.get project_id
