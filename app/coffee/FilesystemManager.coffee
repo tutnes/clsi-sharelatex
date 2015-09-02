@@ -69,6 +69,7 @@ module.exports = FilesystemManager =
 			_callback = () ->
 
 		directory = Path.join(settings.path.compilesDir, project_id)
+		logger.log {directory}, "running rm -r in clearProject"
 		proc = child_process.spawn "rm", ["-r", directory]
 
 		proc.on "error", callback
@@ -119,7 +120,7 @@ module.exports = FilesystemManager =
 		args = [directory, "-type", "f"]
 		if options?.gid?
 			args.push "-gid", options.gid
-		logger.log args: args, "running find command"
+		logger.log args: args, "running find command in getAllFiles"
 
 		proc = child_process.spawn("find", args)
 		stdout = ""
