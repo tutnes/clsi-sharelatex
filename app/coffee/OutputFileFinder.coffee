@@ -7,7 +7,7 @@ module.exports = OutputFileFinder =
 		for resource in resources
 			inputFiles[resource.path] = true
 
-		FilesystemManager.getAllFiles project_id, (error, allFiles) ->
+		FilesystemManager.getAllFiles project_id, {group: 'user'}, (error, allFiles) ->
 			logger.log {project_id, allFiles}, "got file list"
 			jobs = []
 			outputFiles = allFiles.filter (file) -> !inputFiles[file]

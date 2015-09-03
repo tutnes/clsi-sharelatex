@@ -124,6 +124,8 @@ module.exports = FilesystemManager =
 		args = [directory, "-type", "f"]
 		if options?.gid?
 			args.push "-gid", options.gid
+		if options?.group?
+			args.push "-group", options.group
 		logger.log args: args, "running find command in getAllFiles"
 
 		proc = child_process.spawn("find", args)

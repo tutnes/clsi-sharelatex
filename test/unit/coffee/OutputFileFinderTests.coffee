@@ -19,7 +19,7 @@ describe "OutputFileFinder", ->
 			@resources = [
 				path: @resource_path = "resource/path.tex"
 			]
-			@FilesystemManager.getAllFiles = sinon.stub().callsArgWith(1, null, @output_paths.concat([@resource_path]))
+			@FilesystemManager.getAllFiles = sinon.stub().callsArgWith(2, null, @output_paths.concat([@resource_path]))
 			@OutputFileFinder.findOutputFiles @project_id, @resources, (error, @outputFiles) =>
 				
 		it "should get all the files from the FilesystemManager", ->
