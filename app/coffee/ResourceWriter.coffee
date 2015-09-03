@@ -28,10 +28,10 @@ module.exports = ResourceWriter =
 		# and delete any directories which are now empty because those files were removed
 
 		@_findPreviousFiles project_id, (error, oldFilesList) =>
-			logger.log {oldFilesList}, "old files"
+			#logger.log {oldFilesList}, "old files"
 			@_findCurrentFiles project_id, resources, (error, newFilesList) ->
 				removedFilesList = _.difference oldFilesList, newFilesList
-				logger.log {removedFilesList}, "files to remove"
+				#logger.log {removedFilesList}, "files to remove"
 				jobs = []
 				removedFileFromSubdir = false
 				for file in removedFilesList or []
@@ -50,7 +50,7 @@ module.exports = ResourceWriter =
 	_findPreviousFiles: (project_id, callback = (error, result) ->) ->
 		prevFiles = FileListCache.get project_id
 		if prevFiles?
-			logger.log {prevFiles}, "old files"
+			#logger.log {prevFiles}, "old files"
 			callback null, prevFiles
 		else
 			FilesystemManager.getAllFiles project_id, {gid: process.getgid()}, callback
@@ -60,7 +60,7 @@ module.exports = ResourceWriter =
 		for resource in resources
 			newFiles[resource.path] = true
 		newFilesList = _.keys newFiles
-		logger.log {newFilesList}, "new files"
+		#logger.log {newFilesList}, "new files"
 		FileListCache.set project_id, newFilesList
 		callback null, newFilesList
 
