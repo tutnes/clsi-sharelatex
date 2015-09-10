@@ -44,21 +44,24 @@ module.exports = FilesystemManager =
 			return callback(error) if error?
 			mkdirp Path.dirname(path), (error) ->
 				return callback(error) if error?
-				callbackOnce = (error) ->
-					callback(error)
-					callback = () ->
-				writeStream = fs.createWriteStream(path)
-				writeStream.on "error", callbackOnce
-				writeStream.on "close", () -> callbackOnce()
-				readStream.on "error", callbackOnce
-				readStream.pipe(writeStream)
+				fs.unlink path, (error) ->
+					# unlink the file if it exists, ignore errors
+					callbackOnce = (error) ->
+						callback(error)
+						callback = () ->
+					writeStream = fs.createWriteStream(path)
+					writeStream.on "error", callbackOnce
+					writeStream.on "close", () -> callbackOnce()
+					readStream.on "error", callbackOnce
+					readStream.pipe(writeStream)
 			
 	_addFileFromContent: (project_id, filePath, content, callback = (error) ->) ->
 		FilesystemManager._getNormalizedPath project_id, filePath, (error, path) ->
 			return callback(error) if error?
 			mkdirp Path.dirname(path), (error) ->
 				return callback(error) if error?
-				fs.writeFile path, content, callback
+				fs.unlink path, (error) ->
+					fs.writeFile path, content, callback
 			
 	clearProject: (project_id, _callback = (error) ->) -> 
 		callback = (error) ->
