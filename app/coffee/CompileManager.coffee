@@ -126,6 +126,9 @@ module.exports = CompileManager =
 						stream.on "end", () ->
 							delete CompileManager.INPROGRESS_STREAMS[stream_id]
 							callback()
+							
+	sendJupyterReply: (project_id, engine, msg_type, content, callback = (error) ->) ->
+		DockerRunner.sendJupyterReply project_id, engine, msg_type, content, callback
 	
 	interruptJupyterRequest: (project_id, request_id, callback = (error) ->) ->
 		logger.log {project_id, request_id}, "interrupting jupyter request"

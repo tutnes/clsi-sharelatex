@@ -226,6 +226,27 @@ describe "CompileController", ->
 		it "should return 204", ->
 			@res.sendStatus.calledWith(204).should.equal true
 	
+	describe "sendJupyterReply", ->
+		beforeEach ->
+			@req.params =
+				project_id: @project_id
+			@req.body = {
+				msg_type: @msg_type = "input_reply"
+				content: @content = {mock: "content"}
+				engine: @engine = "python"
+			}
+			@res.sendStatus = sinon.stub()
+			@CompileManager.sendJupyterReply = sinon.stub().callsArg(4)
+			@CompileController.sendJupyterReply @req, @res, @next
+		
+		it "should execute the reply", ->
+			@CompileManager.sendJupyterReply
+				.calledWith(@project_id, @engine, @msg_type, @content)
+				.should.equal true
+		
+		it "should return 204", ->
+			@res.sendStatus.calledWith(204).should.equal true
+
 	describe "interruptJupyterRequest", ->
 		beforeEach ->
 			@CompileManager.interruptJupyterRequest = sinon.stub().callsArg(2)
