@@ -6,12 +6,24 @@ wrench = require "wrench"
 mkdirp = require "mkdirp"
 fs = require "fs"
 async = require "async"
+mv = require "mv"
+rimraf = require "rimraf"
 
 module.exports = FilesystemManager =
 			
 	initProject: (project_id, callback = (error) ->) ->
 		directory = Path.join(settings.path.compilesDir, project_id)
-		mkdirp directory, callback
+		mkdirp directory, (error) ->
+			logger.log {error, directory}, "mkdirp directory"
+			return callback(error) if error?
+			outputdir = Path.join(directory, ".output")
+			rimraf outputdir, (error) ->
+				logger.log {error, outputdir}, "rimraf output directory"
+				return callback(error) if error?
+				mkdirp outputdir, (error) ->
+					logger.log {error, outputdir}, "mkdirp output directory"
+					return callback(error) if error?
+					callback()
 			
 	_getNormalizedPath: (project_id, filePath, callback = (error, path) ->) ->
 		basePath = Path.join(settings.path.compilesDir, project_id)
@@ -23,12 +35,14 @@ module.exports = FilesystemManager =
 	deleteFileIfNotDirectory: (project_id, filePath, callback = (error) ->) ->
 		FilesystemManager._getNormalizedPath project_id, filePath, (error, path) ->
 			return callback(error) if error?
-			fs.stat path, (error, stat) ->
+			FilesystemManager._getNormalizedPath project_id, ".output/#{filePath}", (error, newPath) ->
 				return callback(error) if error?
-				if stat.isFile()
-					fs.unlink path, callback
-				else
-					callback()
+				fs.stat path, (error, stat) ->
+					return callback(error) if error?
+					if stat.isFile()
+							mv path, newPath, {mkdirp: true}, callback
+					else
+						callback()
 		
 	addFiles: (project_id, files, callback = (error) ->) ->
 		async.eachSeries files,
@@ -90,7 +104,7 @@ module.exports = FilesystemManager =
 		directory = Path.join(settings.path.compilesDir, project_id)
 		proc = child_process.spawn "find", [directory,
 			"-depth", "-mindepth", "1",
-			"-type", "d", "-empty", "-delete" ]
+			"-type", "d", "-empty", "-not", "-path", "#{directory}/.output*", "-delete" ]
 
 		proc.on "error", callback
 

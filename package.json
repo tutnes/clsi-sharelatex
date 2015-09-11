@@ -24,7 +24,9 @@
     "body-parser": "^1.2.0",
     "underscore": "^1.8.2",
     "v8-profiler": "^5.2.4",
-    "heapdump": "^0.3.5"
+    "heapdump": "^0.3.5",
+    "rimraf": "^2.4.3",
+    "mv": "^2.1.1"
   },
   "devDependencies": {
     "mocha": "1.10.0",
