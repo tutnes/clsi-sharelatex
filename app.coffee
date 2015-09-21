@@ -2,6 +2,7 @@ CompileController = require "./app/js/CompileController"
 Settings = require "settings-sharelatex"
 logger = require "logger-sharelatex"
 ClsiLogger = logger.initialize("clsi").logger
+ContentTypeMapper = require "./app/js/ContentTypeMapper"
 
 if Settings.sentry?.dsn?
 	logger.initializeErrorReporting(Settings.sentry.dsn)
@@ -35,7 +36,7 @@ app = express()
 app.use Metrics.http.monitor(logger)
 
 # Compile requests can take longer than the default two
-# minutes (including file download time), so bump up the 
+# minutes (including file download time), so bump up the
 # timeout a bit.
 TIMEOUT = 6 * 60 * 1000
 app.use (req, res, next) ->
@@ -64,14 +65,9 @@ ForbidSymlinks = require "./app/js/StaticServerForbidSymlinks"
 
 # create a static server which does not allow access to any symlinks
 # avoids possible mismatch of root directory between middleware check
-# and serving the files
+# and serving the files.
 staticServer = ForbidSymlinks express.static, Settings.path.compilesDir, setHeaders: (res, path, stat) ->
-	if Path.basename(path).match(/\.pdf$/)
-		res.set("Content-Type", "application/pdf")
-	else
-		# Force plain treatment of other file types to prevent hosting of HTTP/JS files
-		# that could be used in same-origin/XSS attacks.
-		res.set("Content-Type", "text/plain")
+	res.set("Content-Type", ContentTypeMapper.map(path))
 
 app.get "/project/:project_id/output/*", (req, res, next) ->
 	req.url = "/#{req.params.project_id}/#{req.params[0]}"
@@ -122,4 +118,3 @@ app.listen port = (Settings.internal?.clsi?.port or 3013), host = (Settings.inte
 setInterval () ->
 	ProjectPersistenceManager.clearExpiredProjects()
 , Settings.clsi?.checkProjectsIntervalMs or 10 * 60 * 1000 # 10 mins
-
