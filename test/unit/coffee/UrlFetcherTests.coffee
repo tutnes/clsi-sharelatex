@@ -23,7 +23,6 @@ describe "UrlFetcher", ->
 			@request.get = sinon.stub().returns(@urlStream = new EventEmitter)
 			@urlStream.pipe = sinon.stub()
 			@fs.createWriteStream = sinon.stub().returns(@fileStream = { on: () -> })
-			@fs.unlink = (file, callback) -> callback()
 			@UrlFetcher.pipeUrlToFile(@url, @path, @callback)
 
 		it "should request the URL", ->

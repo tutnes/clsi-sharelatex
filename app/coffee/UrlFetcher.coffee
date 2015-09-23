@@ -5,19 +5,8 @@ logger = require "logger-sharelatex"
 module.exports = UrlFetcher =
 	pipeUrlToFile: (url, filePath, _callback = (error) ->) ->
 		callbackOnce = (error) ->
-			cleanUp error, (error) ->
-				_callback(error)
-				_callback = () ->
-
-		cleanUp = (error, callback) ->
-			if error?
-				logger.log filePath: filePath, "deleting file from cache due to error"
-				fs.unlink filePath, (err) ->
-					if err?
-						logger.err err: err, filePath: filePath, "error deleting file from cache"
-					callback(error)
-			else
-				callback()
+			_callback(error)
+			_callback = () ->
 
 		fileStream = fs.createWriteStream(filePath)
 		fileStream.on 'error', (error) ->

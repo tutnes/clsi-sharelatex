@@ -30,14 +30,23 @@ module.exports = UrlCache =
 			# MYSQL only stores dates to an accuracy of a second but the incoming lastModified might have milliseconds.
 			# So round down to seconds
 			lastModified = new Date(Math.floor(lastModified.getTime() / 1000) * 1000)
+		
+		cleanUpAndCallback = (error) ->
+			logger.log {project_id, url}, "deleting file from cache due to error"
+			UrlCache._clearUrlFromCache project_id, url, (error2) ->
+				if error2?
+					# We've already got an error in progress, so just log this one
+					logger.err {err: error2, project_id, url}, "error cleaning cache after error"
+				callback(error)
+		
 		UrlCache._doesUrlNeedDownloading project_id, url, lastModified, (error, needsDownloading) =>
 			return callback(error) if error?
 			if needsDownloading
 				logger.log url: url, lastModified: lastModified, "downloading URL"
 				UrlFetcher.pipeUrlToFile url, UrlCache._cacheFilePathForUrl(project_id, url), (error) =>
-					return callback(error) if error?
+					return cleanUpAndCallback(error) if error?
 					UrlCache._updateOrCreateUrlDetails project_id, url, lastModified, (error) =>
-						return callback(error) if error?
+						return cleanUpAndCallback(error) if error?
 						callback null, UrlCache._cacheFilePathForUrl(project_id, url)
 			else
 				logger.log url: url, lastModified: lastModified, "URL is up to date in cache"

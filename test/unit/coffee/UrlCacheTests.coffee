@@ -123,6 +123,30 @@ describe "UrlCache", ->
 				@callback
 					.calledWith(null, @UrlCache._cacheFilePathForUrl(@project_id, @url))
 					.should.equal true
+					
+		describe "when there is an error piping the file", ->
+			beforeEach ->
+				@UrlCache._clearUrlFromCache = sinon.stub().callsArg(2)
+				@UrlCache._doesUrlNeedDownloading = sinon.stub().callsArgWith(3, null, true)
+				@UrlFetcher.pipeUrlToFile = sinon.stub().callsArgWith(2, new Error("oops"))
+				@UrlCache._ensureUrlIsInCache(@project_id, @url, @lastModified, @callback)
+			
+			it "should delete the cache entry", ->
+				@UrlCache._clearUrlFromCache
+					.calledWith(@project_id, @url)
+					.should.equal true
+					
+		describe "when there is an error inserting a database entry for the url", ->
+			beforeEach ->
+				@UrlCache._clearUrlFromCache = sinon.stub().callsArg(2)
+				@UrlCache._doesUrlNeedDownloading = sinon.stub().callsArgWith(3, null, true)
+				@UrlCache._updateOrCreateUrlDetails = sinon.stub().callsArgWith(3, new Error("oops"))
+				@UrlCache._ensureUrlIsInCache(@project_id, @url, @lastModified, @callback)
+			
+			it "should delete the cache entry", ->
+				@UrlCache._clearUrlFromCache
+					.calledWith(@project_id, @url)
+					.should.equal true
 
 	describe "getPathOnDisk", ->
 		beforeEach ->
