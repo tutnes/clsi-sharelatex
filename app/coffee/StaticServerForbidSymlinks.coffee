@@ -8,7 +8,12 @@ module.exports = ForbidSymlinks = (staticFn, root, options) ->
 	expressStatic = staticFn root, options
 	basePath = Path.resolve(root)
 	return (req, res, next) ->
-		path = url.parse(req.url)?.pathname
+		try
+			# decode any special characters, eg. %20 for spaces
+			path = decodeURI url.parse(req.url)?.pathname
+		except error
+			logger.error error: error, url: req.url, "req.url contains invalid characters"
+			return res.sendStatus(404)
 		# check that the path is of the form /project_id/path/to/file
 		if result = path.match(/^\/?(\w+)\/(.*)/)
 			project_id = result[1]
