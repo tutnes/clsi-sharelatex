@@ -11,7 +11,7 @@ module.exports = ForbidSymlinks = (staticFn, root, options) ->
 		try
 			# decode any special characters, eg. %20 for spaces
 			path = decodeURI url.parse(req.url)?.pathname
-		except error
+		catch error
 			logger.error error: error, url: req.url, "req.url contains invalid characters"
 			return res.sendStatus(404)
 		# check that the path is of the form /project_id/path/to/file
