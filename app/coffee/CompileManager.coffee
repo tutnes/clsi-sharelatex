@@ -96,6 +96,11 @@ module.exports = CompileManager =
 				file.path.match(/^\.|\/\./)  # files beginning with . or containing /.
 			callback(error, filesExcludingHidden)
 
+	sendOutputFiles: (project_id, callback = (error, tarStream) ->) ->
+		DockerRunner.streamOutputFiles project_id, {}, (error, tarStream) ->
+			return callback(error) if error?
+			callback(null, tarStream)
+
 	deleteFile: (project_id, file, callback = (error) ->) ->
 		cmd = ['/bin/rm', '-f', '--', file]
 		DockerRunner.run project_id, cmd, {skipImport:true}, {}, (error, stream) ->

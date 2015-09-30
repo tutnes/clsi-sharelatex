@@ -51,6 +51,16 @@ module.exports = CompileController =
 							type: file.type
 			}
 
+	sendOutputFiles: (req, res, next) ->
+		{project_id} = req.params
+		CompileManager.sendOutputFiles project_id, (error, tarStream) ->
+			if error?
+				res.sendStatus 500
+			else if not tarStream?
+				res.sendStatus 204
+			else
+				tarStream.pipe(res)
+
 	deleteFile: (req, res, next) ->
 		{project_id, file} = req.params
 		CompileManager.deleteFile project_id, file, (error) ->

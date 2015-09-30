@@ -53,7 +53,12 @@ app.post "/project/:project_id/reply", bodyParser.json(limit: "5mb"), CompileCon
 app.post "/project/:project_id/request/:request_id/interrupt", CompileController.interruptJupyterRequest
 
 app.delete '/project/:project_id/output/:file(\\S+)', CompileController.deleteFile
-app.get "/project/:project_id/output", CompileController.listFiles
+
+app.get "/project/:project_id/output", (req, res, next) ->
+	if req.query.format is "tar"
+		CompileController.sendOutputFiles req, res, next
+	else
+		CompileController.listFiles req, res, next
 
 app.get  "/project/:project_id/sync/code", CompileController.syncFromCode
 app.get  "/project/:project_id/sync/pdf", CompileController.syncFromPdf
