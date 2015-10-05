@@ -59,6 +59,9 @@ module.exports = CompileController =
 			else if not tarStream?
 				res.sendStatus 204
 			else
+				# disable nginx buffering because we have encountered
+				# corruption of chunks when proxying through nginx
+				res.set "X-Accel-Buffering", "no"
 				tarStream.pipe(res)
 
 	deleteFile: (req, res, next) ->
