@@ -108,6 +108,14 @@ module.exports = CompileManager =
 			stream.on "end", () ->
 				callback()
 
+	loadProjectFromImage: (project_id, image_name, callback = (error, data) ->) ->
+		logger.log {project_id, image_name}, "loading image"
+		DockerRunner.loadFromImage project_id, image_name, callback
+
+	saveProjectToImage: (project_id, image_name, callback = (error, data) ->) ->
+		logger.log {project_id, image_name}, "saving image"
+		DockerRunner.saveToImage project_id, image_name, callback
+
 	sendJupyterRequest: (project_id, resources, request_id, engine, msg_type, content, limits, _callback = (error) ->) ->
 		callback = (args...) ->
 			_callback(args...)

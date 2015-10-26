@@ -54,6 +54,9 @@ app.post "/project/:project_id/request/:request_id/interrupt", CompileController
 
 app.delete '/project/:project_id/output/:file(\\S+)', CompileController.deleteFile
 
+app.post   "/project/:project_id/load/:from_image(\\S+)", CompileController.loadProjectFromImage
+app.post   "/project/:project_id/save/:to_image(\\S+)", CompileController.saveProjectToImage
+
 app.get "/project/:project_id/output", (req, res, next) ->
 	if req.query.format is "tar"
 		CompileController.sendOutputFiles req, res, next

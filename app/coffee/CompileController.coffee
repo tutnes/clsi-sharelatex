@@ -70,6 +70,18 @@ module.exports = CompileController =
 			return next(error) if error?
 			res.sendStatus(204)
 
+	loadProjectFromImage: (req, res, next) ->
+		{project_id, from_image} = req.params
+		CompileManager.loadProjectFromImage project_id, from_image, (error, data) ->
+			return next(error) if error?
+			res.status(200).send(data)
+
+	saveProjectToImage: (req, res, next) ->
+		{project_id, to_image} = req.params
+		CompileManager.saveProjectToImage project_id, to_image, (error, data) ->
+			return next(error) if error?
+			res.status(200).send(data)
+
 	sendJupyterRequest: (req, res, next) ->
 		{project_id} = req.params
 		{request_id, msg_type, content, limits, engine, resources} = req.body
