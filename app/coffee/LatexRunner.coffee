@@ -40,6 +40,9 @@ module.exports = LatexRunner =
 		else if compiler == "apt-get-install"
 			command = LatexRunner._aptGetInstallCommand options.package
 			privileged = true
+		else if compiler == 'package-install'
+			command = LatexRunner._packageInstallCommand options.package, options.source
+			privileged = true
 		else
 			return callback new Error("unknown compiler: #{compiler}")
 
@@ -77,3 +80,4 @@ module.exports = LatexRunner =
 	
 	_aptGetInstallCommand: (pkg) -> ["python", "-u", "/usr/bin/datajoy-apt-get-install.py", pkg]
 
+	_packageInstallCommand: (pkg, source) -> ['python', '-u', '/usr/bin/datajoy-install-package.py', source, pkg]

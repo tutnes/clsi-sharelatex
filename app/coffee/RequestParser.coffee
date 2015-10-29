@@ -1,5 +1,5 @@
 module.exports = RequestParser =
-	VALID_COMPILERS: ["pdflatex", "latex", "xelatex", "lualatex", "python", "r", "command", "apt-get-install"]
+	VALID_COMPILERS: ["pdflatex", "latex", "xelatex", "lualatex", "python", "r", "command", "apt-get-install", "package-install"]
 	MAX_TIMEOUT:    300  # Seconds
 	MAX_MEMORY:     4096 # Mb
 	MAX_CPU_SHARES: 4096 # Relative (1024 default)
@@ -35,8 +35,13 @@ module.exports = RequestParser =
 				compile.options.package
 				default: ""
 				type: "string"
-			
-			response.env = @_parseAttribute "env", 
+
+			response.source = @_parseAttribute "source",
+				compile.options.source
+				default: ""
+				type: "string"
+
+			response.env = @_parseAttribute "env",
 				compile.options.env
 				default: {}
 				type: "object"
