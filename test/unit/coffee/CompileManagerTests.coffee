@@ -45,6 +45,7 @@ describe "CompileManager", ->
 				compiler: @compiler = "pdflatex"
 				command: @command = []
 				package: @package = ""
+				source: @source = ""
 				env: @env = { "mock": "env" }
 				timeout: @timeout = 42000
 				processes: @processes = 42
@@ -86,6 +87,7 @@ describe "CompileManager", ->
 					compiler:  @compiler
 					command:   @command
 					package:   @package
+					source:    @source
 					env:       @env
 					timeout:   @timeout
 					processes: @processes = 42
