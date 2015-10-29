@@ -276,6 +276,22 @@ describe "RequestParser", ->
 			@callback.calledWith(new Error "rootResourcePath attribute should be a string")
 				.should.equal true
 
+	describe "with a package attribute", ->
+		beforeEach ->
+			@validRequest.compile.options.compiler = 'apt-get-install'
+			@validRequest.compile.options.package = 'some-package'
+			@RequestParser.parse (@validRequest), (error, @data) =>
 
-		
+		it "should use the package", ->
+			@data.package.should.equal 'some-package'
 
+	describe "with a package and source attribute", ->
+		beforeEach ->
+			@validRequest.compile.options.compiler = 'package-install'
+			@validRequest.compile.options.package = 'some-package'
+			@validRequest.compile.options.source = 'some-source'
+			@RequestParser.parse (@validRequest), (error, @data) =>
+
+		it "should use the package and source attributes", ->
+			@data.package.should.equal 'some-package'
+			@data.source.should.equal 'some-source'
