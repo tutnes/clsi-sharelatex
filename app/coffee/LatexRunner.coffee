@@ -14,6 +14,7 @@ module.exports = LatexRunner =
 			memory:     options.memory or 512 # Mb
 			cpu_shares: options.cpu_shares or 1024 # Relative weighting, 1024 is default
 			processes:  options.processes or 100 # Number of running processes
+			imageName:  options.imageName
 		}
 
 		logger.log {project_id, compiler, limits, mainFile}, "starting compile"

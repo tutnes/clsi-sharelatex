@@ -43,6 +43,7 @@ module.exports = CompileManager =
 						timeout:   request.timeout
 						processes: request.processes
 						memory:    request.memory
+						imageName: request.imageName
 						cpu_shares: request.cpu_shares
 					}, (error, stream) ->
 						return callback(error) if error?

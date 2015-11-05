@@ -25,7 +25,13 @@ module.exports = RequestParser =
 				validValues: @VALID_COMPILERS
 				default: "pdflatex"
 				type: "string"
-			
+
+			imageName = @_parseAttribute "imageName",
+				compile.options.imageName
+				default: ""
+				type: "string"
+			response.imageName = imageName if imageName # only define if non-empty
+
 			response.command = @_parseAttribute "command", 
 				compile.options.command
 				default: []
