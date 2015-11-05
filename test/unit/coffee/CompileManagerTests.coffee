@@ -91,6 +91,7 @@ describe "CompileManager", ->
 					processes: @processes = 42
 					memory:    @memory = 1024
 					cpu_shares: @cpu_shares = 2048
+					imageName: undefined
 				})
 				.should.equal true
 

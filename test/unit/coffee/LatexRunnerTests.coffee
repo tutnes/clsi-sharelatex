@@ -43,6 +43,7 @@ describe "LatexRunner", ->
 						memory: @memory
 						cpu_shares: @cpu_shares
 						processes: @processes
+						imageName: undefined
 					})
 					.should.equal true
 
