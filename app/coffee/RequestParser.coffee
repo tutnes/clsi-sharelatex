@@ -1,6 +1,6 @@
 module.exports = RequestParser =
 	VALID_COMPILERS: ["pdflatex", "latex", "xelatex", "lualatex", "python", "r", "command", "apt-get-install", "package-install"]
-	MAX_TIMEOUT:    300  # Seconds
+	MAX_TIMEOUT:    60 * 30  # Seconds
 	MAX_MEMORY:     4096 # Mb
 	MAX_CPU_SHARES: 4096 # Relative (1024 default)
 	MAX_PROCESSES:  1024
