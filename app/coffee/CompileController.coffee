@@ -11,8 +11,6 @@ module.exports = CompileController =
 		RequestParser.parse req.body, (error, request) ->
 			return next(error) if error?
 			request.project_id = req.params.project_id
-			if request.compiler == 'package-install'
-				res.setTimeout 30 * 60 * 1000
 			CompileManager.doCompile request, (error, outputFiles = [], output = {}) ->
 				if error?
 					logger.error err: error, project_id: request.project_id, "error running compile"
