@@ -59,3 +59,19 @@ describe "LatexRunner", ->
 				mainFile = command.slice(-1)[0]
 				mainFile.should.equal "$COMPILE_DIR/main-file.tex"
 
+		describe "with package-install compiler", ->
+			beforeEach ->
+				@compiler = 'package-install'
+				@LatexRunner.runLatex @project_id,
+					mainFile: 'main-file.Rtex'
+					compiler:  @compiler
+					package: 'some-package'
+					source: 'some-source'
+					@callback
+
+			it "should run the latex command on the equivalent .tex file", ->
+				command = @CommandRunner.run.args[0][1]
+				command_string = command.join(' ')
+				command_string.indexOf('datajoy-install-package.py').should.not.equal -1
+				command_string.indexOf('some-package').should.not.equal -1
+				command_string.indexOf('some-source').should.not.equal -1
