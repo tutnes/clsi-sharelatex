@@ -120,7 +120,7 @@ describe "RealTimeApiManager", ->
 					{ header: { msg_type: "execute_result" }, content: { 
 						data: {
 							"text/plain": "12345..."
-							# Should remove unused data types, i.e. text/html
+							"text/html":  "1234567890"
 						}
 					} }
 				]
