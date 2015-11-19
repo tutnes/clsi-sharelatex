@@ -48,7 +48,6 @@ module.exports = RealTimeApiManager =
 				message.content.text = trim(message.content.text)
 			if message.header?.msg_type == "execute_result"
 				delete message.content.data?["text/markdown"]
-				delete message.content.data?["text/html"]
 				delete message.content.data?["text/latex"]
 				if message.content.data?["text/plain"]?
 					message.content.data["text/plain"] = trim(message.content.data["text/plain"])
