@@ -74,11 +74,11 @@ module.exports = LatexRunner =
 			"-pdf", "-e", "$pdflatex='lualatex -synctex=1 -interaction=batchmode %O %S'",
 			Path.join("$COMPILE_DIR", mainFile)
 		]
-		
-	_pythonCommand: (mainFile) -> ["python", "-u", "/usr/bin/datajoy-wrapper.py", mainFile]
+
+	_pythonCommand: (mainFile) -> ["python2", "-u", "/usr/bin/datajoy-wrapper.py", mainFile]
 
 	_rCommand: (mainFile) -> ["Rscript", "/usr/bin/datajoy-wrapper.R", mainFile]
-	
-	_aptGetInstallCommand: (pkg) -> ["python", "-u", "/usr/bin/datajoy-apt-get-install.py", pkg]
 
-	_packageInstallCommand: (pkg, source) -> ['python', '-u', '/usr/bin/datajoy-install-package.py', source, pkg]
+	_aptGetInstallCommand: (pkg) -> ["python2", "-u", "/usr/bin/datajoy-apt-get-install.py", pkg]
+
+	_packageInstallCommand: (pkg, source) -> ['python2', '-u', '/usr/bin/datajoy-install-package.py', source, pkg]
