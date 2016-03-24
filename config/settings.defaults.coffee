@@ -30,7 +30,7 @@ module.exports =
 	internal:
 		clsi:
 			port: 3013
-			host: "localhost"
+			host: "0.0.0.0"
 
 	apis:
 		clsi:
