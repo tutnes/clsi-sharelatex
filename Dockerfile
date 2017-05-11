@@ -10,7 +10,7 @@ RUN add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) 
 RUN add-apt-repository ppa:chris-lea/node.js
 RUN echo "deb http://us.archive.ubuntu.com/ubuntu/ precise universe" >> /etc/apt/sources.list
 RUN apt-get update
-RUN apt-get install -y nodejs build-essential zlib1g-dev latexmk
+RUN apt-get install -y nodejs build-essential zlib1g-dev latexmk texlive-full
 
 # Install app dependencies
 COPY package.json /src/package.json
@@ -20,6 +20,8 @@ RUN npm install -g grunt-cli
 
 COPY Gruntfile.coffee /src/Gruntfile.coffee
 RUN cd /src; grunt install
+#RUN tlmgr init-usertree
+#RUN tlmgr install scheme-full
 
 # Bundle app source
 COPY . /src
